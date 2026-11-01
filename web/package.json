@@ -1,0 +1,12 @@
+{
+  "name": "mcxx-online-compiler",
+  "version": "1.0.0",
+  "description": "Online Web Playground and REST API for the Micro C++ Compiler (mcxx)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["cpp", "compiler", "playground", "mcxx", "x86"],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ Compiler</title>
+    <meta name="description" content="Playful and fast online C++ Compiler. Write code, smash run, and see results instantly!">
+    <!-- Google Fonts: Plus Jakarta Sans for friendly UI, JetBrains Mono for clean code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation Bar -->
+        <header class="navbar">
+            <div class="brand">
+                <div class="brand-badge">
+                    <span class="brand-emoji">⚡</span>
+                </div>
+                <div class="brand-text">
+                    <h1>C++ Compiler</h1>
+                </div>
+            </div>
+
+            <div class="nav-controls">
+                <!-- Example Selector -->
+                <div class="control-group">
+                    <span class="control-icon">💡</span>
+                    <select id="example-select" class="dropdown" title="Choose a fun starter template">
+                        <option value="">Choose a recipe...</option>
+                    </select>
+                </div>
+
+                <!-- File Upload Button -->
+                <label for="file-upload" class="btn btn-secondary file-upload-label" title="Upload any .cpp file">
+                    <span class="btn-icon">📂</span>
+                    <span>Upload .cpp</span>
+                    <input type="file" id="file-upload" accept=".cpp,.c,.h" style="display: none;">
+                </label>
+
+                <!-- Run Button (Chunky 3D Playful Button) -->
+                <button id="btn-run" class="btn btn-run" title="Run your code! (Ctrl + Enter)">
+                    <span class="spinner" id="run-spinner"></span>
+                    <span class="btn-icon" id="run-icon">▶</span>
+                    <span class="btn-text">Run Code</span>
+                    <kbd class="shortcut-pill">Ctrl+↵</kbd>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <!-- Left Pane: Code Editor -->
+            <section class="editor-pane">
+                <div class="pane-header">
+                    <div class="window-controls">
+                        <span class="dot dot-red"></span>
+                        <span class="dot dot-yellow"></span>
+                        <span class="dot dot-green"></span>
+                    </div>
+                    <div class="file-tab">
+                        <span class="tab-icon">📄</span>
+                        <span id="active-filename">main.cpp</span>
+                    </div>
+                    <div class="editor-stats">
+                        <span id="status-indicator" class="pulsing-badge">Ready</span>
+                        <span id="char-count" class="lines-counter">0 lines</span>
+                    </div>
+                </div>
+
+                <!-- Editor Container with line numbers -->
+                <div class="editor-wrapper" id="drop-zone">
+                    <div class="line-numbers" id="line-numbers">1</div>
+                    <textarea id="code-editor" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="// Type your C++ code here and hit Run!&#10;// Or drag & drop any .cpp file right here!"></textarea>
+                    
+                    <div class="drop-overlay" id="drop-overlay">
+                        <div class="drop-card">
+                            <span class="drop-emoji">📬</span>
+                            <h3>Drop your .cpp file here</h3>
+                            <p>We'll load it up and run it instantly!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Pane: Terminal Output -->
+            <section class="output-pane">
+                <div class="pane-header output-header">
+                    <div class="window-controls">
+                        <span class="dot dot-red"></span>
+                        <span class="dot dot-yellow"></span>
+                        <span class="dot dot-green"></span>
+                    </div>
+                    <div class="terminal-title">
+                        <span class="terminal-icon">💻</span>
+                        <span>Console Output</span>
+                    </div>
+
+                    <div class="output-actions">
+                        <button id="btn-clear-output" class="icon-pill-btn" title="Clear console">
+                            <span>🧹 Clear</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Terminal Content -->
+                <div class="output-content">
+                    <div class="terminal-toolbar">
+                        <div class="status-tags">
+                            <span class="playful-tag idle" id="exec-status">☕ Ready</span>
+                            <span class="playful-tag time" id="exec-time">⚡ 0 ms</span>
+                            <span class="playful-tag code" id="exec-code">Exit: 0</span>
+                        </div>
+                    </div>
+                    <pre id="console-output" class="terminal-window">Hit "Run Code" (or press Ctrl+Enter) to see your program execute! 🚀</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

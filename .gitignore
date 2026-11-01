@@ -1,0 +1,39 @@
+# Binaries & Object Files
+*.exe
+*.o
+*.obj
+*.s
+*.a
+*.lib
+*.dll
+*.so
+*.dylib
+
+# Temporary Compilation Artifacts
+temp_*
+a.exe
+a.out
+*.tmp
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Build Directories
+build/
+dist/
+bin/
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
