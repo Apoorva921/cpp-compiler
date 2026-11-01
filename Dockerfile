@@ -1,6 +1,6 @@
-FROM node:18-bullseye-slim
+FROM node:20-bookworm-slim
 
-# Install GCC, G++, 32-bit multilib libraries, and Make from Debian official repos
+# Install GCC, G++, 32-bit multilib libraries, and Make from Debian Bookworm official repos
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
