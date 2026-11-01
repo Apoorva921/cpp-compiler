@@ -1,9 +1,12 @@
-FROM gcc:12-bullseye
+FROM node:18-bullseye-slim
 
-# Install Node.js 18
-RUN apt-get update && apt-get install -y curl gcc-multilib g++-multilib make \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
+# Install GCC, G++, 32-bit multilib libraries, and Make from Debian official repos
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    gcc-multilib \
+    g++-multilib \
+    make \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -12,16 +15,16 @@ WORKDIR /app
 COPY Makefile ./
 COPY src ./src
 COPY examples ./examples
-COPY test_sample.cpp ./
 
-# Build mcxx compiler for Linux
-RUN make
+# Build native compiler for Linux
+RUN make && chmod +x mcxx
 
-# Copy web app
+# Copy web application
 COPY web ./web
 
 WORKDIR /app/web
 
+ENV PORT=3000
 EXPOSE 3000
 
 CMD ["node", "server.js"]

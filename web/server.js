@@ -182,6 +182,10 @@ const server = http.createServer(async (req, res) => {
         if (pathname === '/app.js') {
             return sendFile(res, path.join(PUBLIC_DIR, 'app.js'), 'application/javascript');
         }
+        if (pathname === '/health' || pathname === '/healthz') {
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            return res.end('OK');
+        }
 
         // GET /api/examples: return list of ready-to-run programs
         if (pathname === '/api/examples') {

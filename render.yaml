@@ -6,6 +6,4 @@ services:
     region: oregon
     branch: main
     autoDeploy: true
-    envVars:
-      - key: PORT
-        value: 3000
+    healthCheckPath: /health
