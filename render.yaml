@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: cpp-compiler
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 3000

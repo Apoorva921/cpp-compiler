@@ -126,7 +126,11 @@ int main(int argc, char* argv[]) {
         if (onlyAssemble) {
             outputFile = "output.s";
         } else {
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
             outputFile = "a.exe";
+#else
+            outputFile = "a.out";
+#endif
         }
     }
 
@@ -167,7 +171,13 @@ int main(int argc, char* argv[]) {
     // 6. Run if requested
     if (runImmediately) {
         std::cout << "\n--- Running " << outputFile << " ---\n";
-        int runRet = std::system(outputFile.c_str());
+        std::string runCmd = outputFile;
+#if !defined(_WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
+        if (runCmd.find('/') == std::string::npos) {
+            runCmd = "./" + runCmd;
+        }
+#endif
+        int runRet = std::system(runCmd.c_str());
         std::cout << "\n--- Program exited with code " << runRet << " ---\n";
     }
 

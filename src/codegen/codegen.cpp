@@ -2,6 +2,12 @@
 #include <iomanip>
 #include <iostream>
 
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+static const std::string SYM_PREFIX = "_";
+#else
+static const std::string SYM_PREFIX = "";
+#endif
+
 namespace mcxx {
 
 CodeGenerator::CodeGenerator(SymbolTable& symTable) : symTable(symTable) {}
@@ -35,7 +41,11 @@ std::string CodeGenerator::addStringLiteral(const std::string& str) {
 }
 
 std::string CodeGenerator::generate(Program& program) {
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
     rdataOut << "\t.section .rdata,\"dr\"\n";
+#else
+    rdataOut << "\t.section .rodata\n";
+#endif
     dataOut << "\t.data\n";
     textOut << "\t.text\n";
 
@@ -64,7 +74,9 @@ std::string CodeGenerator::generate(Program& program) {
 
     std::ostringstream fullAsm;
     fullAsm << "\t.file \"mcxx_output.cpp\"\n";
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
     fullAsm << "\t.def ___main; .scl 2; .type 32; .endef\n";
+#endif
     fullAsm << rdataOut.str();
     fullAsm << dataOut.str();
     fullAsm << textOut.str();
@@ -73,7 +85,7 @@ std::string CodeGenerator::generate(Program& program) {
 }
 
 void CodeGenerator::genGlobalVar(GlobalVarDecl& gv) {
-    std::string label = "_" + gv.name;
+    std::string label = SYM_PREFIX + gv.name;
     dataOut << "\t.globl\t" << label << "\n";
     dataOut << "\t.align\t4\n";
     dataOut << label << ":\n";
@@ -124,13 +136,17 @@ void CodeGenerator::genClass(ClassDecl& cd) {
 void CodeGenerator::genFunction(FunctionDecl& fn) {
     std::string funcLabel;
     if (fn.isMethod) {
-        funcLabel = "_" + fn.parentClassName + "_" + fn.name;
+        funcLabel = SYM_PREFIX + fn.parentClassName + "_" + fn.name;
     } else {
-        funcLabel = "_" + fn.name;
+        funcLabel = SYM_PREFIX + fn.name;
     }
 
     textOut << "\t.globl\t" << funcLabel << "\n";
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
     textOut << "\t.def\t" << funcLabel << ";\t.scl\t2;\t.type\t32;\t.endef\n";
+#else
+    textOut << "\t.type\t" << funcLabel << ", @function\n";
+#endif
     emitLabel(funcLabel);
 
     // Function Prologue
@@ -140,10 +156,12 @@ void CodeGenerator::genFunction(FunctionDecl& fn) {
     currentFunctionFrameSize = fn.stackFrameSize;
     emitLine("subl\t$" + std::to_string(currentFunctionFrameSize) + ", %esp");
 
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
     // MinGW runtime init in main
     if (fn.name == "main" && !fn.isMethod) {
         emitLine("call\t___main");
     }
+#endif
 
     if (fn.body) {
         genBlock(*fn.body);
@@ -258,7 +276,7 @@ void CodeGenerator::genStmt(Stmt& stmt) {
         for (const auto& e : cs->expressions) {
             if (dynamic_cast<EndlExpr*>(e.get())) {
                 emitLine("pushl\t$10"); // '\n'
-                emitLine("call\t_putchar");
+                emitLine("call\t" + SYM_PREFIX + "putchar");
                 emitLine("addl\t$4, %esp");
             } else if (e->resolvedType && e->resolvedType->isPointer() &&
                        e->resolvedType->pointeeType && e->resolvedType->pointeeType->isChar()) {
@@ -266,19 +284,19 @@ void CodeGenerator::genStmt(Stmt& stmt) {
                 emitLine("pushl\t%eax");
                 std::string fmt = addStringLiteral("%s");
                 emitLine("pushl\t$" + fmt);
-                emitLine("call\t_printf");
+                emitLine("call\t" + SYM_PREFIX + "printf");
                 emitLine("addl\t$8, %esp");
             } else if (e->resolvedType && e->resolvedType->isChar()) {
                 genExpr(*e);
                 emitLine("pushl\t%eax");
-                emitLine("call\t_putchar");
+                emitLine("call\t" + SYM_PREFIX + "putchar");
                 emitLine("addl\t$4, %esp");
             } else {
                 genExpr(*e);
                 emitLine("pushl\t%eax");
                 std::string fmt = addStringLiteral("%d");
                 emitLine("pushl\t$" + fmt);
-                emitLine("call\t_printf");
+                emitLine("call\t" + SYM_PREFIX + "printf");
                 emitLine("addl\t$8, %esp");
             }
         }
@@ -288,7 +306,7 @@ void CodeGenerator::genStmt(Stmt& stmt) {
             emitLine("pushl\t%edx");
             std::string fmt = addStringLiteral("%d");
             emitLine("pushl\t$" + fmt);
-            emitLine("call\t_scanf");
+            emitLine("call\t" + SYM_PREFIX + "scanf");
             emitLine("addl\t$8, %esp");
         }
     } else if (auto rs = dynamic_cast<ReturnStmt*>(&stmt)) {
@@ -631,7 +649,7 @@ void CodeGenerator::genExpr(Expr& expr) {
             emitLine("pushl\t%eax");
         }
 
-        std::string callTarget = "_" + ce->callee;
+        std::string callTarget = SYM_PREFIX + ce->callee;
         // Check if member method in current class
         if (!currentClassName.empty()) {
             auto methodFn = symTable.lookupFunction(currentClassName + "::" + ce->callee);
@@ -639,7 +657,7 @@ void CodeGenerator::genExpr(Expr& expr) {
                 // push 'this' pointer as first argument!
                 emitLine("movl\t8(%ebp), %eax");
                 emitLine("pushl\t%eax");
-                callTarget = "_" + currentClassName + "_" + ce->callee;
+                callTarget = SYM_PREFIX + currentClassName + "_" + ce->callee;
                 emitLine("call\t" + callTarget);
                 emitLine("addl\t$" + std::to_string((ce->args.size() + 1) * 4) + ", %esp");
                 return;
@@ -682,7 +700,7 @@ void CodeGenerator::genExpr(Expr& expr) {
             cName = objType->className;
         }
 
-        std::string target = "_" + cName + "_" + mce->methodName;
+        std::string target = SYM_PREFIX + cName + "_" + mce->methodName;
         emitLine("call\t" + target);
         emitLine("addl\t$" + std::to_string((mce->args.size() + 1) * 4) + ", %esp");
     } else if (auto ie = dynamic_cast<IndexExpr*>(&expr)) {
@@ -705,14 +723,14 @@ void CodeGenerator::genExpr(Expr& expr) {
                 emitLine("imull\t$" + std::to_string(elemSize) + ", %eax");
             }
             emitLine("pushl\t%eax");
-            emitLine("call\t_malloc");
+            emitLine("call\t" + SYM_PREFIX + "malloc");
             emitLine("addl\t$4, %esp");
         } else {
             // new ClassName(args)
             auto cls = symTable.lookupClass(ne->allocatedType.name);
             int sz = cls ? cls->size() : 4;
             emitLine("pushl\t$" + std::to_string(sz));
-            emitLine("call\t_malloc");
+            emitLine("call\t" + SYM_PREFIX + "malloc");
             emitLine("addl\t$4, %esp");
 
             // Save allocated pointer
@@ -732,7 +750,7 @@ void CodeGenerator::genExpr(Expr& expr) {
                 emitLine("movl\t" + std::to_string(stackOffsetFromTop) + "(%esp), %eax");
                 emitLine("pushl\t%eax");
 
-                std::string target = "_" + ne->allocatedType.name + "_" + ne->allocatedType.name;
+                std::string target = SYM_PREFIX + ne->allocatedType.name + "_" + ne->allocatedType.name;
                 emitLine("call\t" + target);
                 emitLine("addl\t$" + std::to_string((ne->constructorArgs.size() + 1) * 4) + ", %esp");
             }

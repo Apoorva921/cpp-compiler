@@ -430,11 +430,14 @@ docker build -t cpp-compiler:latest .
 docker run -d -p 3000:3000 --name cpp-compiler-app cpp-compiler:latest
 ```
 
-### Deploying to Render / Railway
-1. Push your repository to GitHub.
-2. Link the repository to your Render or Railway account.
-3. Select **Docker** as the runtime environment.
-4. Set the port to `3000`. The service will automatically build the native compiler and start the HTTP server.
+### 🚀 1-Click Cloud Deployment to Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Apoorva921/cpp-compiler)
+
+1. Click the **Deploy to Render** button above (or sign in to [render.com](https://render.com) and click **New + > Blueprint**).
+2. Select your repository `Apoorva921/cpp-compiler`.
+3. Render reads [`render.yaml`](render.yaml) and automatically builds the Docker container.
+4. Your compiler goes live 24/7 on a free public HTTPS domain (`https://cpp-compiler-xxxx.onrender.com`).
 
 ---
 

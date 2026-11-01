@@ -1,4 +1,4 @@
-CXX = g++
+CXX ?= g++
 CXXFLAGS = -std=c++14 -Wall -Wextra -O2 -Isrc
 
 SRCS = src/lexer/token.cpp \
@@ -9,7 +9,11 @@ SRCS = src/lexer/token.cpp \
        src/codegen/codegen.cpp \
        src/main.cpp
 
-TARGET = mcxx.exe
+ifeq ($(OS),Windows_NT)
+    TARGET = mcxx.exe
+else
+    TARGET = mcxx
+endif
 
 all: $(TARGET)
 
@@ -17,6 +21,6 @@ $(TARGET): $(SRCS)
 	$(CXX) $(CXXFLAGS) -o $(TARGET) $(SRCS)
 
 clean:
-	rm -f $(TARGET) *.exe *.s
+	rm -f $(TARGET) *.exe *.s a.out
 
 .PHONY: all clean

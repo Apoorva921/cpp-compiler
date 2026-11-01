@@ -7,12 +7,14 @@ const crypto = require('crypto');
 
 const PORT = process.env.PORT || 3000;
 const ROOT_DIR = path.resolve(__dirname, '..');
-const MCXX_BIN = path.join(ROOT_DIR, 'mcxx.exe');
+const MCXX_BIN = fs.existsSync(path.join(ROOT_DIR, 'mcxx.exe'))
+    ? path.join(ROOT_DIR, 'mcxx.exe')
+    : path.join(ROOT_DIR, 'mcxx');
 const PUBLIC_DIR = path.join(__dirname, 'public');
 
-// Ensure mcxx.exe exists
+// Ensure compiler binary exists
 if (!fs.existsSync(MCXX_BIN)) {
-    console.warn(`[WARNING] mcxx.exe not found at ${MCXX_BIN}. Please run 'mingw32-make' first.`);
+    console.warn(`[WARNING] mcxx compiler binary not found at ${MCXX_BIN}. Please run 'make' first.`);
 }
 
 function sendJson(res, statusCode, data) {
@@ -79,9 +81,11 @@ function runMcxxCommand(args, code, stdinInput = "10\n20\n", timeoutMs = 8000) {
         fs.writeFileSync(inputPath, code, 'utf8');
 
         // Replace placeholder paths in args
+        const isWin = process.platform === 'win32';
+        const outBinary = path.join(tempDir, isWin ? 'out.exe' : 'out');
         const resolvedArgs = args.map(a => {
             if (a === '<INPUT>') return inputPath;
-            if (a === '<OUTPUT_EXE>') return path.join(tempDir, 'out.exe');
+            if (a === '<OUTPUT_EXE>') return outBinary;
             if (a === '<OUTPUT_S>') return path.join(tempDir, 'out.s');
             return a;
         });

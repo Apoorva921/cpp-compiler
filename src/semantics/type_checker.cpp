@@ -1,6 +1,12 @@
 #include "type_checker.hpp"
 #include <iostream>
 
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+static const std::string SYM_PREFIX = "_";
+#else
+static const std::string SYM_PREFIX = "";
+#endif
+
 namespace mcxx {
 
 TypeChecker::TypeChecker() {
@@ -11,7 +17,7 @@ void TypeChecker::registerBuiltins() {
     // printf(char* fmt, ...) -> int
     FunctionSymbol printfSym;
     printfSym.name = "printf";
-    printfSym.mangledName = "_printf";
+    printfSym.mangledName = SYM_PREFIX + "printf";
     printfSym.returnType = Type::makeInt();
     printfSym.paramTypes.push_back(Type::makePointer(Type::makeChar()));
     printfSym.paramNames.push_back("fmt");
@@ -21,7 +27,7 @@ void TypeChecker::registerBuiltins() {
     // puts(char* s) -> int
     FunctionSymbol putsSym;
     putsSym.name = "puts";
-    putsSym.mangledName = "_puts";
+    putsSym.mangledName = SYM_PREFIX + "puts";
     putsSym.returnType = Type::makeInt();
     putsSym.paramTypes.push_back(Type::makePointer(Type::makeChar()));
     putsSym.paramNames.push_back("s");
@@ -31,7 +37,7 @@ void TypeChecker::registerBuiltins() {
     // putchar(int c) -> int
     FunctionSymbol putcharSym;
     putcharSym.name = "putchar";
-    putcharSym.mangledName = "_putchar";
+    putcharSym.mangledName = SYM_PREFIX + "putchar";
     putcharSym.returnType = Type::makeInt();
     putcharSym.paramTypes.push_back(Type::makeInt());
     putcharSym.paramNames.push_back("c");
@@ -41,7 +47,7 @@ void TypeChecker::registerBuiltins() {
     // scanf(char* fmt, ...) -> int
     FunctionSymbol scanfSym;
     scanfSym.name = "scanf";
-    scanfSym.mangledName = "_scanf";
+    scanfSym.mangledName = SYM_PREFIX + "scanf";
     scanfSym.returnType = Type::makeInt();
     scanfSym.paramTypes.push_back(Type::makePointer(Type::makeChar()));
     scanfSym.paramNames.push_back("fmt");
@@ -51,7 +57,7 @@ void TypeChecker::registerBuiltins() {
     // malloc(int size) -> void*
     FunctionSymbol mallocSym;
     mallocSym.name = "malloc";
-    mallocSym.mangledName = "_malloc";
+    mallocSym.mangledName = SYM_PREFIX + "malloc";
     mallocSym.returnType = Type::makePointer(Type::makeVoid());
     mallocSym.paramTypes.push_back(Type::makeInt());
     mallocSym.paramNames.push_back("size");
@@ -61,7 +67,7 @@ void TypeChecker::registerBuiltins() {
     // free(void* ptr) -> void
     FunctionSymbol freeSym;
     freeSym.name = "free";
-    freeSym.mangledName = "_free";
+    freeSym.mangledName = SYM_PREFIX + "free";
     freeSym.returnType = Type::makeVoid();
     freeSym.paramTypes.push_back(Type::makePointer(Type::makeVoid()));
     freeSym.paramNames.push_back("ptr");
@@ -71,7 +77,7 @@ void TypeChecker::registerBuiltins() {
     // exit(int code) -> void
     FunctionSymbol exitSym;
     exitSym.name = "exit";
-    exitSym.mangledName = "_exit";
+    exitSym.mangledName = SYM_PREFIX + "exit";
     exitSym.returnType = Type::makeVoid();
     exitSym.paramTypes.push_back(Type::makeInt());
     exitSym.paramNames.push_back("code");
@@ -214,7 +220,7 @@ void TypeChecker::firstPassCollectFunctions(Program& program) {
             sym.name = gv->name;
             sym.type = resolveType(gv->type, gv->loc);
             sym.kind = SymbolKind::GlobalVar;
-            sym.globalLabel = "_" + gv->name;
+            sym.globalLabel = SYM_PREFIX + gv->name;
             if (!symTable.declareVar(gv->name, sym)) {
                 error("Redefinition of global variable '" + gv->name + "'", gv->loc);
             }
