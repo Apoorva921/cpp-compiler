@@ -6,6 +6,7 @@
 
 <br/>
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-cpp--compiler--2lmt.onrender.com-00C7B7.svg?style=for-the-badge&logo=render&logoColor=white)](https://cpp-compiler-2lmt.onrender.com/)
 [![Build Status](https://img.shields.io/badge/Build-Passing-2ea44f.svg?style=for-the-badge&logo=github-actions&logoColor=white)](https://github.com/Apoorva921/cpp-compiler)
 [![Language](https://img.shields.io/badge/Language-C%2B%2B14%20Standard-00599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)](https://isocpp.org/)
 [![Target Architecture](https://img.shields.io/badge/Target-x86--32%20AT%26T-FF6B6B.svg?style=for-the-badge&logo=intel&logoColor=white)](https://en.wikipedia.org/wiki/X86)
@@ -15,6 +16,7 @@
 
 <br/>
 
+[🚀 Live Playground](https://cpp-compiler-2lmt.onrender.com/) •
 [Key Features](#-key-features) •
 [Architecture](#-compiler-architecture) •
 [Quick Start](#-quick-start) •

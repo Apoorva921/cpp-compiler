@@ -157,7 +157,11 @@ int main(int argc, char* argv[]) {
     }
 
     // 5. Invoke GCC to assemble and link
+#if !defined(_WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
+    std::string gccCmd = "gcc -m32 -no-pie -z noexecstack \"" + tempAsmFile + "\" -o \"" + outputFile + "\"";
+#else
     std::string gccCmd = "gcc -m32 \"" + tempAsmFile + "\" -o \"" + outputFile + "\"";
+#endif
     int ret = std::system(gccCmd.c_str());
     if (ret != 0) {
         std::cerr << "error: gcc assembler/linker failed with code " << ret << "\n";
